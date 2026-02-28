@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:14-alpine
+    container_name: tinyurl-postgres-go
+    environment:
+      POSTGRES_USER: tinyurl_user
+      POSTGRES_PASSWORD: tinyurl_password
+      POSTGRES_DB: tinyurl
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tinyurl_user -d tinyurl"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tinyurl-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: tinyurl-redis-go
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - tinyurl-network
+
+  # TinyURL API Service (Go)
+  api:
+    build: .
+    container_name: tinyurl-api-go
+    environment:
+      DATABASE_URL: postgresql://tinyurl_user:tinyurl_password@postgres:5432/tinyurl?sslmode=disable
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ""
+      REDIS_DB: 0
+      BASE_URL: http://localhost:8080
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tinyurl-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  tinyurl-network:
+    driver: bridge
