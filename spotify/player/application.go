@@ -1,15 +1,16 @@
-package app
+package player
 
 import (
+	"app/enum"
+	"app/managers"
+	"app/model"
 	"fmt"
-	"musicplayer/enums"
-	"musicplayer/managers"
-	"musicplayer/models"
 	"sync"
 )
 
 type MusicPlayerApplication struct {
-	songLibrary []*models.Song
+	songLibrary []*model.Song
+	facade      *MusicPlayerFacade
 }
 
 var (
@@ -20,19 +21,20 @@ var (
 func GetMusicPlayerApplication() *MusicPlayerApplication {
 	appOnce.Do(func() {
 		appInstance = &MusicPlayerApplication{}
+
 	})
 	return appInstance
 }
 
 func (a *MusicPlayerApplication) CreateSongInLibrary(title, artist, path string) {
-	a.songLibrary = append(a.songLibrary, &models.Song{
+	a.songLibrary = append(a.songLibrary, &model.Song{
 		Title:    title,
 		Artist:   artist,
 		FilePath: path,
 	})
 }
 
-func (a *MusicPlayerApplication) FindSongByTitle(title string) (*models.Song, error) {
+func (a *MusicPlayerApplication) FindSongByTitle(title string) (*model.Song, error) {
 	for _, s := range a.songLibrary {
 		if s.Title == title {
 			return s, nil
@@ -53,11 +55,11 @@ func (a *MusicPlayerApplication) AddSongToPlaylist(playlistName, songTitle strin
 	return managers.GetPlaylistManager().AddSongToPlaylist(playlistName, song)
 }
 
-func (a *MusicPlayerApplication) ConnectAudioDevice(deviceType enums.DeviceType) {
+func (a *MusicPlayerApplication) ConnectAudioDevice(deviceType enum.DeviceType) {
 	GetMusicPlayerFacade().ConnectDevice(deviceType)
 }
 
-func (a *MusicPlayerApplication) SelectPlayStrategy(strategyType enums.PlayStrategyType) error {
+func (a *MusicPlayerApplication) SelectPlayStrategy(strategyType enum.PlayStrategyType) error {
 	return GetMusicPlayerFacade().SetPlayStrategy(strategyType)
 }
 

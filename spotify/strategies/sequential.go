@@ -1,12 +1,12 @@
 package strategies
 
 import (
+	"app/model"
 	"errors"
-	"musicplayer/models"
 )
 
 type SequentialPlayStrategy struct {
-	playlist     *models.Playlist
+	playlist     *model.Playlist
 	currentIndex int
 }
 
@@ -14,7 +14,7 @@ func NewSequentialPlayStrategy() *SequentialPlayStrategy {
 	return &SequentialPlayStrategy{currentIndex: -1}
 }
 
-func (s *SequentialPlayStrategy) SetPlaylist(playlist *models.Playlist) {
+func (s *SequentialPlayStrategy) SetPlaylist(playlist *model.Playlist) {
 	s.playlist = playlist
 	s.currentIndex = -1
 }
@@ -26,7 +26,7 @@ func (s *SequentialPlayStrategy) HasNext() bool {
 	return s.currentIndex+1 < s.playlist.Size()
 }
 
-func (s *SequentialPlayStrategy) Next() (*models.Song, error) {
+func (s *SequentialPlayStrategy) Next() (*model.Song, error) {
 	if s.playlist == nil || s.playlist.Size() == 0 {
 		return nil, errors.New("no playlist loaded or playlist is empty")
 	}
@@ -41,7 +41,7 @@ func (s *SequentialPlayStrategy) HasPrevious() bool {
 	return s.currentIndex-1 >= 0
 }
 
-func (s *SequentialPlayStrategy) Previous() (*models.Song, error) {
+func (s *SequentialPlayStrategy) Previous() (*model.Song, error) {
 	if s.playlist == nil || s.playlist.Size() == 0 {
 		return nil, errors.New("no playlist loaded or playlist is empty")
 	}
@@ -52,6 +52,6 @@ func (s *SequentialPlayStrategy) Previous() (*models.Song, error) {
 	return s.playlist.Songs()[s.currentIndex], nil
 }
 
-func (s *SequentialPlayStrategy) AddToNext(_ *models.Song) error {
+func (s *SequentialPlayStrategy) AddToNext(_ *model.Song) error {
 	return nil // no-op for sequential
 }

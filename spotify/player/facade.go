@@ -1,19 +1,19 @@
-package app
+package player
 
 import (
+	"app/core"
+	"app/enum"
+	"app/managers"
+	"app/model"
+	"app/strategies"
 	"errors"
 	"fmt"
-	"musicplayer/core"
-	"musicplayer/enums"
-	"musicplayer/managers"
-	"musicplayer/models"
-	"musicplayer/strategies"
 	"sync"
 )
 
 type MusicPlayerFacade struct {
 	audioEngine    *core.AudioEngine
-	loadedPlaylist *models.Playlist
+	loadedPlaylist *model.Playlist
 	playStrategy   strategies.PlayStrategy
 }
 
@@ -31,11 +31,11 @@ func GetMusicPlayerFacade() *MusicPlayerFacade {
 	return facadeInstance
 }
 
-func (f *MusicPlayerFacade) ConnectDevice(deviceType enums.DeviceType) {
+func (f *MusicPlayerFacade) ConnectDevice(deviceType enum.DeviceType) {
 	managers.GetDeviceManager().Connect(deviceType)
 }
 
-func (f *MusicPlayerFacade) SetPlayStrategy(strategyType enums.PlayStrategyType) error {
+func (f *MusicPlayerFacade) SetPlayStrategy(strategyType enum.PlayStrategyType) error {
 	s, err := managers.GetStrategyManager().GetStrategy(strategyType)
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (f *MusicPlayerFacade) LoadPlaylist(name string) error {
 	return nil
 }
 
-func (f *MusicPlayerFacade) PlaySong(song *models.Song) error {
+func (f *MusicPlayerFacade) PlaySong(song *model.Song) error {
 	output, err := managers.GetDeviceManager().GetOutputDevice()
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (f *MusicPlayerFacade) PlaySong(song *models.Song) error {
 	return f.audioEngine.Play(output, song)
 }
 
-func (f *MusicPlayerFacade) PauseSong(song *models.Song) error {
+func (f *MusicPlayerFacade) PauseSong(song *model.Song) error {
 	if f.audioEngine.CurrentSongTitle() != song.Title {
 		return fmt.Errorf("cannot pause %q; it is not currently playing", song.Title)
 	}
@@ -131,7 +131,7 @@ func (f *MusicPlayerFacade) PlayPreviousTrack() error {
 	return f.audioEngine.Play(output, song)
 }
 
-func (f *MusicPlayerFacade) EnqueueNext(song *models.Song) error {
+func (f *MusicPlayerFacade) EnqueueNext(song *model.Song) error {
 	if f.playStrategy == nil {
 		return errors.New("no play strategy set")
 	}

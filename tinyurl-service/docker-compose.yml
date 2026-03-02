@@ -58,7 +58,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - .:/app
+      - .:/player
     networks:
       - tinyurl-network
     restart: unless-stopped

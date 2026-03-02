@@ -1,23 +1,23 @@
 package strategies
 
 import (
+	"app/model"
 	"errors"
-	"musicplayer/models"
 )
 
 // CustomQueueStrategy plays from a priority queue first, then falls back to sequential
 type CustomQueueStrategy struct {
-	playlist     *models.Playlist
+	playlist     *model.Playlist
 	currentIndex int
-	nextQueue    []*models.Song // songs to play next (FIFO)
-	prevStack    []*models.Song // history for going back (LIFO)
+	nextQueue    []*model.Song // songs to play next (FIFO)
+	prevStack    []*model.Song // history for going back (LIFO)
 }
 
 func NewCustomQueueStrategy() *CustomQueueStrategy {
 	return &CustomQueueStrategy{currentIndex: -1}
 }
 
-func (c *CustomQueueStrategy) SetPlaylist(playlist *models.Playlist) {
+func (c *CustomQueueStrategy) SetPlaylist(playlist *model.Playlist) {
 	c.playlist = playlist
 	c.currentIndex = -1
 	c.nextQueue = nil
@@ -31,12 +31,12 @@ func (c *CustomQueueStrategy) HasNext() bool {
 	return len(c.nextQueue) > 0 || c.currentIndex+1 < c.playlist.Size()
 }
 
-func (c *CustomQueueStrategy) Next() (*models.Song, error) {
+func (c *CustomQueueStrategy) Next() (*model.Song, error) {
 	if c.playlist == nil || c.playlist.Size() == 0 {
 		return nil, errors.New("no playlist loaded or playlist is empty")
 	}
 
-	var song *models.Song
+	var song *model.Song
 
 	if len(c.nextQueue) > 0 {
 		// Dequeue from priority queue
@@ -67,7 +67,7 @@ func (c *CustomQueueStrategy) HasPrevious() bool {
 	return len(c.prevStack) > 0
 }
 
-func (c *CustomQueueStrategy) Previous() (*models.Song, error) {
+func (c *CustomQueueStrategy) Previous() (*model.Song, error) {
 	if c.playlist == nil || c.playlist.Size() == 0 {
 		return nil, errors.New("no playlist loaded or playlist is empty")
 	}
@@ -89,7 +89,7 @@ func (c *CustomQueueStrategy) Previous() (*models.Song, error) {
 	return song, nil
 }
 
-func (c *CustomQueueStrategy) AddToNext(song *models.Song) error {
+func (c *CustomQueueStrategy) AddToNext(song *model.Song) error {
 	if song == nil {
 		return errors.New("cannot enqueue nil song")
 	}

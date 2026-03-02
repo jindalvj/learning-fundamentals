@@ -1,13 +1,13 @@
 package managers
 
 import (
+	"app/device"
+	"app/enum"
+	"app/factory"
+	"app/model"
+	"app/strategies"
 	"errors"
 	"fmt"
-	"musicplayer/device"
-	"musicplayer/enums"
-	"musicplayer/factory"
-	"musicplayer/models"
-	"musicplayer/strategies"
 	"sync"
 )
 
@@ -29,7 +29,7 @@ func GetDeviceManager() *DeviceManager {
 	return deviceManagerInstance
 }
 
-func (d *DeviceManager) Connect(deviceType enums.DeviceType) {
+func (d *DeviceManager) Connect(deviceType enum.DeviceType) {
 	d.currentDevice = factory.CreateDevice(deviceType)
 	fmt.Printf("%s device connected\n", deviceType)
 }
@@ -48,7 +48,7 @@ func (d *DeviceManager) HasOutputDevice() bool {
 // ─── PlaylistManager ─────────────────────────────────────────────────────────
 
 type PlaylistManager struct {
-	playlists map[string]*models.Playlist
+	playlists map[string]*model.Playlist
 }
 
 var (
@@ -59,7 +59,7 @@ var (
 func GetPlaylistManager() *PlaylistManager {
 	playlistManagerOnce.Do(func() {
 		playlistManagerInstance = &PlaylistManager{
-			playlists: make(map[string]*models.Playlist),
+			playlists: make(map[string]*model.Playlist),
 		}
 	})
 	return playlistManagerInstance
@@ -69,11 +69,11 @@ func (pm *PlaylistManager) CreatePlaylist(name string) error {
 	if _, exists := pm.playlists[name]; exists {
 		return fmt.Errorf("playlist %q already exists", name)
 	}
-	pm.playlists[name] = models.NewPlaylist(name)
+	pm.playlists[name] = model.NewPlaylist(name)
 	return nil
 }
 
-func (pm *PlaylistManager) AddSongToPlaylist(playlistName string, song *models.Song) error {
+func (pm *PlaylistManager) AddSongToPlaylist(playlistName string, song *model.Song) error {
 	p, exists := pm.playlists[playlistName]
 	if !exists {
 		return fmt.Errorf("playlist %q not found", playlistName)
@@ -81,7 +81,7 @@ func (pm *PlaylistManager) AddSongToPlaylist(playlistName string, song *models.S
 	return p.AddSong(song)
 }
 
-func (pm *PlaylistManager) GetPlaylist(name string) (*models.Playlist, error) {
+func (pm *PlaylistManager) GetPlaylist(name string) (*model.Playlist, error) {
 	p, exists := pm.playlists[name]
 	if !exists {
 		return nil, fmt.Errorf("playlist %q not found", name)
@@ -113,13 +113,13 @@ func GetStrategyManager() *StrategyManager {
 	return strategyManagerInstance
 }
 
-func (sm *StrategyManager) GetStrategy(strategyType enums.PlayStrategyType) (strategies.PlayStrategy, error) {
+func (sm *StrategyManager) GetStrategy(strategyType enum.PlayStrategyType) (strategies.PlayStrategy, error) {
 	switch strategyType {
-	case enums.Sequential:
+	case enum.Sequential:
 		return sm.sequential, nil
-	case enums.Random:
+	case enum.Random:
 		return sm.random, nil
-	case enums.CustomQueue:
+	case enum.CustomQueue:
 		return sm.customQueue, nil
 	default:
 		return nil, errors.New("unknown strategy type")

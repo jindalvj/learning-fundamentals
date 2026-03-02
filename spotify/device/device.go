@@ -1,14 +1,14 @@
 package device
 
 import (
+	"app/external"
+	"app/model"
 	"fmt"
-	"musicplayer/external"
-	"musicplayer/models"
 )
 
 // IAudioOutputDevice is the target interface all adapters implement
 type IAudioOutputDevice interface {
-	PlayAudio(song *models.Song)
+	PlayAudio(song *model.Song)
 }
 
 // --- Bluetooth Adapter ---
@@ -20,7 +20,7 @@ func NewBluetoothSpeakerAdapter(api *external.BluetoothSpeakerAPI) *BluetoothSpe
 	return &BluetoothSpeakerAdapter{api: api}
 }
 
-func (b *BluetoothSpeakerAdapter) PlayAudio(song *models.Song) {
+func (b *BluetoothSpeakerAdapter) PlayAudio(song *model.Song) {
 	payload := fmt.Sprintf("%s by %s", song.Title, song.Artist)
 	b.api.PlaySoundViaBluetooth(payload)
 }
@@ -34,7 +34,7 @@ func NewWiredSpeakerAdapter(api *external.WiredSpeakerAPI) *WiredSpeakerAdapter 
 	return &WiredSpeakerAdapter{api: api}
 }
 
-func (w *WiredSpeakerAdapter) PlayAudio(song *models.Song) {
+func (w *WiredSpeakerAdapter) PlayAudio(song *model.Song) {
 	payload := fmt.Sprintf("%s by %s", song.Title, song.Artist)
 	w.api.PlaySoundViaCable(payload)
 }
@@ -48,7 +48,7 @@ func NewHeadphonesAdapter(api *external.HeadphonesAPI) *HeadphonesAdapter {
 	return &HeadphonesAdapter{api: api}
 }
 
-func (h *HeadphonesAdapter) PlayAudio(song *models.Song) {
+func (h *HeadphonesAdapter) PlayAudio(song *model.Song) {
 	payload := fmt.Sprintf("%s by %s", song.Title, song.Artist)
 	h.api.PlaySoundViaJack(payload)
 }

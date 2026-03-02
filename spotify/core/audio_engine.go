@@ -1,14 +1,14 @@
 package core
 
 import (
+	"app/device"
+	"app/model"
 	"errors"
 	"fmt"
-	"musicplayer/device"
-	"musicplayer/models"
 )
 
 type AudioEngine struct {
-	currentSong *models.Song
+	currentSong *model.Song
 	paused      bool
 }
 
@@ -27,7 +27,7 @@ func (a *AudioEngine) IsPaused() bool {
 	return a.paused
 }
 
-func (a *AudioEngine) Play(output device.IAudioOutputDevice, song *models.Song) error {
+func (a *AudioEngine) Play(output device.IAudioOutputDevice, song *model.Song) error {
 	if song == nil {
 		return errors.New("cannot play a nil song")
 	}

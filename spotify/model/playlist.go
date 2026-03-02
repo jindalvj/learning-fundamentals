@@ -1,6 +1,8 @@
-package models
+package model
 
-import "errors"
+import (
+	"errors"
+)
 
 type Playlist struct {
 	Name  string

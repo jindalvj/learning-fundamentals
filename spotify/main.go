@@ -1,13 +1,14 @@
 package main
 
 import (
+	enums "app/enum"
+	"app/player"
 	"fmt"
-	"musicplayer/app"
-	"musicplayer/enums"
+	//"enums"
 )
 
 func main() {
-	player := app.GetMusicPlayerApplication()
+	player := player.GetMusicPlayerApplication()
 
 	// Populate library
 	player.CreateSongInLibrary("Kesariya", "Arijit Singh", "/music/kesariya.mp3")

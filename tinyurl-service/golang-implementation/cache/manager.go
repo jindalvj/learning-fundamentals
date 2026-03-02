@@ -137,7 +137,7 @@ func (m *Manager) GetStats(shortCode string) (*models.URLStats, error) {
 // SetStats stores statistics in cache
 func (m *Manager) SetStats(shortCode string, stats *models.URLStats, ttl time.Duration) error {
 	key := fmt.Sprintf("stats:%s", shortCode)
-	
+
 	data, err := json.Marshal(stats)
 	if err != nil {
 		return fmt.Errorf("failed to marshal stats: %w", err)
@@ -200,7 +200,7 @@ func (m *Manager) SetMany(mapping map[string]string, ttl time.Duration) error {
 	}
 
 	pipe := m.client.Pipeline()
-	
+
 	for key, value := range mapping {
 		if ttl > 0 {
 			pipe.Set(m.ctx, key, value, ttl)
@@ -264,7 +264,7 @@ func (m *Manager) GetCacheStats() (*models.CacheStats, error) {
 	}
 
 	// Get Redis info
-	info, err := m.client.Info(m.ctx, "stats").Result()
+	_, err = m.client.Info(m.ctx, "stats").Result()
 	if err != nil {
 		return nil, err
 	}
